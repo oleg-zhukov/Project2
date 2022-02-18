@@ -264,6 +264,7 @@ def ask1(req, res, user_id):
             res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
             sessionStorage[user_id]['cats'] += 1
             sessionStorage[user_id]['reask'] = True
+            sessionStorage[user_id]["noask"] = True
 
 
 def reask(req, res, user_id):
@@ -340,11 +341,12 @@ def askTheme(req, res, user_id):
 
 def dialog(req, res):
     user_id = req['session']['user_id']
-
+    print(sessionStorage[user_id])
     if req['session']['new']:
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
         sessionStorage[user_id] = {
+            'noask': False,
             'message': '',
             'address': '',
             'theme': '',
@@ -371,8 +373,7 @@ def dialog(req, res):
     if not sessionStorage[user_id]['cats']:
         sessionStorage[user_id]['cats'] = 0
 
-    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id][
-        'cats'] < 3 and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
+    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and not sessionStorage[user_id]["noask"] and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
         print("First asks")
         ask1(req, res, user_id)
         return
