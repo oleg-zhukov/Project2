@@ -287,7 +287,7 @@ def reask(req, res, user_id):
             res['response'][
                 'text'] = f'Вы подразумевали категорию {translateTheme(sessionStorage[user_id]["theme_max"])}?'
             sessionStorage[user_id]['cats'] += 1
-            sessionStorage[user_id]['ask_cat'] = True
+            sessionStorage[user_id]['askcat'] = True
             sessionStorage[user_id]['reask'] = False
 
     else:
