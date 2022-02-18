@@ -367,10 +367,10 @@ def dialog(req, res):
     # Обрабатываем ответ пользователя.
     # Это может быть сообщение - тогда нужно его запомнить и спросить адрес
     # Если сообщение меньше 8 токенов переспрашиваем
+    sessionStorage[user_id]['message'] = req['request']['original_utterance']
     if not sessionStorage[user_id]['cats']:
         sessionStorage[user_id]['cats'] = 0
 
-    sessionStorage[user_id]['message'] = req['request']['original_utterance']
 
     if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id]['cats'] < 3 and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
         ask1(req, res, user_id)
