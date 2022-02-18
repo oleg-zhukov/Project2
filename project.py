@@ -345,6 +345,8 @@ def dialog(req, res):
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
         sessionStorage[user_id] = {
+            'theme_max': -1,
+            'cat_max': -1,
             'noask': False,
             'message': '',
             'address': '',
