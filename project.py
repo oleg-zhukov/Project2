@@ -301,7 +301,7 @@ def reask(req, res, user_id):
             sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
             res['response'][
                 'text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
-
+            sessionStorage[user_id]['cats'] += 1000
             sessionStorage[user_id]['askcat'] = True
             sessionStorage[user_id]['reask'] = False
 
@@ -379,7 +379,6 @@ def dialog(req, res):
 
 
     elif sessionStorage[user_id]['reask']:
-
         print('Reasking...')
         if sessionStorage[user_id]["reask_msg"]:
             themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
