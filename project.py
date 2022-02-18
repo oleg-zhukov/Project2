@@ -247,7 +247,7 @@ def ask1(req, res, user_id):
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
             res['response']['end_session'] = True
         elif ask(sessionStorage[user_id]['message']) == -1:
-            sessionStorage[user_id]['themes'][sessionStorage[user_id]['theme_max']] = 0
+            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
             res['response'][
                 'text'] = f'Вы подразумевали категорию {translateTheme(sessionStorage[user_id]["theme_max"])}?'
