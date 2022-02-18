@@ -341,7 +341,6 @@ def askTheme(req, res, user_id):
 
 def dialog(req, res):
     user_id = req['session']['user_id']
-    print(sessionStorage[user_id])
     if req['session']['new']:
         # Это новый пользователь.
         # Инициализируем сессию и поприветствуем его.
@@ -363,7 +362,7 @@ def dialog(req, res):
         # Заполняем текст ответа
         res['response']['text'] = 'Здравствуйте! Пожалуйста, расскажите, что произошло'
         return
-
+    print(sessionStorage[user_id])
     # Сюда дойдем, если пользователь не новый,
     # и разговор с Алисой уже был начат
     # Обрабатываем ответ пользователя.
