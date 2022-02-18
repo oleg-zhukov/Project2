@@ -212,7 +212,6 @@ sessionStorage = {}
 
 
 def call_process(request):
-
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
@@ -372,12 +371,14 @@ def dialog(req, res):
     if not sessionStorage[user_id]['cats']:
         sessionStorage[user_id]['cats'] = 0
 
-
-    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id]['cats'] < 3 and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
+    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id][
+        'cats'] < 3 and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
+        print("First asks")
         ask1(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['reask']:
+        print('Reasking...')
         themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
         cat_proba = cat_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['themes'] *= themes_proba
@@ -387,13 +388,14 @@ def dialog(req, res):
         return
 
     elif sessionStorage[user_id]['askcat']:
+        print("Asking cat...")
         askcat(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['asktheme']:
+        print("Asking themes...")
         askTheme(req, res, user_id)
         return
-
 
     '''else:
         f_name = '/content/drive/MyDrive/Data/dataset.csv'
