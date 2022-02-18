@@ -215,7 +215,6 @@ def call_process(request):
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
-    print(request.json)
     response = {
         'session': request.json['session'],
         'version': request.json['version'],
@@ -268,6 +267,7 @@ def ask1(req, res, user_id):
 
 
 def reask(req, res, user_id):
+    sessionStorage[user_id]["reask_msg"] = False
     if sessionStorage[user_id]['cats'] == 0:
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
         res['response']['text'] = f'Вы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}?'
@@ -301,7 +301,7 @@ def reask(req, res, user_id):
             sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
             res['response'][
                 'text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
-            sessionStorage[user_id]['cats'] += 1
+
             sessionStorage[user_id]['askcat'] = True
             sessionStorage[user_id]['reask'] = False
 
@@ -356,6 +356,7 @@ def dialog(req, res):
             'askcat': False,
             'asktheme': False,
             'new': True,
+            'reask_msg': True
         }
         # Заполняем текст ответа
         res['response']['text'] = 'Здравствуйте! Пожалуйста, расскажите, что произошло'
@@ -367,7 +368,6 @@ def dialog(req, res):
     # Это может быть сообщение - тогда нужно его запомнить и спросить адрес
     # Если сообщение меньше 8 токенов переспрашиваем
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
-    print(sessionStorage[user_id]['message'])
     if not sessionStorage[user_id]['cats']:
         sessionStorage[user_id]['cats'] = 0
 
@@ -377,13 +377,16 @@ def dialog(req, res):
         ask1(req, res, user_id)
         return
 
+
     elif sessionStorage[user_id]['reask']:
+
         print('Reasking...')
-        themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
-        cat_proba = cat_model.predict_proba(sessionStorage[user_id]['message'])
-        sessionStorage[user_id]['themes'] *= themes_proba
-        sessionStorage[user_id]['categories'] *= cat_proba
-        sessionStorage[user_id]['cats'] = 0
+        if sessionStorage[user_id]["reask_msg"]:
+            themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
+            cat_proba = cat_model.predict_proba(sessionStorage[user_id]['message'])
+            sessionStorage[user_id]['themes'] *= themes_proba
+            sessionStorage[user_id]['categories'] *= cat_proba
+            sessionStorage[user_id]['cats'] = 0
         reask(req, res, user_id)
         return
 
