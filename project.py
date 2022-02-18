@@ -197,9 +197,9 @@ def askCat(categorie):
 
 
 def ask(txt):
-    if any(x in txt.lower() for x in decline):
+    if any(x in txt[0].lower() for x in decline):
         return -1
-    elif any(x in txt.lower() for x in accept):
+    elif any(x in txt[0].lower() for x in accept):
         return 1
     else:
         return 0
