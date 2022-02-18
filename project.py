@@ -216,6 +216,7 @@ def call_process(request):
     # Начинаем формировать ответ, согласно документации
     # мы собираем словарь, который потом при помощи
     # библиотеки json преобразуем в JSON и отдадим Алисе
+    print(request.json)
     response = {
         'session': request.json['session'],
         'version': request.json['version'],
