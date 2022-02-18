@@ -371,8 +371,7 @@ def dialog(req, res):
 
     sessionStorage[user_id]['message'] = req['request']['original_utterance']
 
-    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id][
-        'cats'] < 3 and not sessionStorage[user_id]['ask_cat'] and not sessionStorage[user_id]['reask']:
+    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and sessionStorage[user_id]['cats'] < 3 and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
         ask1(req, res, user_id)
         return
 
