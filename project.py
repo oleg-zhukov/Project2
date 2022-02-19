@@ -195,7 +195,10 @@ def ask(txt):
 
 
 def to_zeros(arr, cat):
-    arr[0][:] = [0 for i in range(len(arr[0])) if i not in getThemesOfCat(cat) else arr[0][i]]
+    x = getThemesOfCat(cat)
+    for i in range(len(arr[0])):
+        if themes[i] not in x:
+            arr[0][i] = 0
 
 cat_model = joblib.load('./clfs/cat_clf')  # load classificator of categories
 themes_model = joblib.load('./clfs/themes_clf')  # load classificator of themes
