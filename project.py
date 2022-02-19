@@ -248,19 +248,19 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]['askcat'] = True
 
     else:
-        if ask(sessionStorage[user_id]['message']) == 1:
-            sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
-            sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
-            res['response'][
-                'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
-            res['response']['end_session'] = True
-        elif ask(sessionStorage[user_id]['message']) == -1:
+        if ask(sessionStorage[user_id]['message']) == -1:
             sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
             sessionStorage[user_id]['cats'] += 1
             sessionStorage[user_id]['reask'] = True
             sessionStorage[user_id]["noask"] = True
-
+            sessionStorage[user_id]['reask_msg'] = True
+        elif ask(sessionStorage[user_id]['message']) == 1:
+            sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
+            sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
+            res['response'][
+                'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
+            res['response']['end_session'] = True            
 
 def reask(req, res, user_id):
     sessionStorage[user_id]["reask_msg"] = False
@@ -367,8 +367,6 @@ def dialog(req, res):
     # Это может быть сообщение - тогда нужно его запомнить и спросить адрес
     # Если сообщение меньше 8 токенов переспрашиваем
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
-    if not sessionStorage[user_id]['cats']:
-        sessionStorage[user_id]['cats'] = 0
 
     if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and not sessionStorage[user_id]["noask"] and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
         print("First asks")
