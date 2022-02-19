@@ -298,7 +298,7 @@ def reask(req, res, user_id):
 
 def askcat(req, res, user_id):
     if ask(sessionStorage[user_id]['message']) == 1:
-        res['response']['text'] = f'Принято, категория: {translateCategorie(sessionStorage[user_id]["cat_max"])}\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme"])}'
+        res['response']['text'] = f'Принято, категория: {translateCategorie(sessionStorage[user_id]["cat_max"])}\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}'
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
         sessionStorage[user_id]['askcat'] = False
         sessionStorage[user_id]['asktheme'] = True
