@@ -194,6 +194,9 @@ def ask(txt):
         return 0
 
 
+def to_zeros(arr, cat):
+    arr[0][:] = [0 for i in range(len(arr[0])) if i not in getThemesOfCat(cat) else arr[0][i]]
+
 cat_model = joblib.load('./clfs/cat_clf')  # load classificator of categories
 themes_model = joblib.load('./clfs/themes_clf')  # load classificator of themes
 
@@ -302,6 +305,7 @@ def askcat(req, res, user_id):
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
         sessionStorage[user_id]['askcat'] = False
         sessionStorage[user_id]['asktheme'] = True
+        to_zeros(sessionStorage[user_id]["themes"], sessionStorage[user_id]["categorie"])
     else:
         sessionStorage[user_id]['categories'][0][sessionStorage[user_id]['cat_max']] = 0
         sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
