@@ -306,6 +306,7 @@ def askcat(req, res, user_id):
         sessionStorage[user_id]['askcat'] = False
         sessionStorage[user_id]['asktheme'] = True
         to_zeros(sessionStorage[user_id]["themes"], sessionStorage[user_id]["categorie"])
+        print(sessionStorage[user_id]["themes"])
     else:
         sessionStorage[user_id]['categories'][0][sessionStorage[user_id]['cat_max']] = 0
         sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
