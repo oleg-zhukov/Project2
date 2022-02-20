@@ -7,6 +7,10 @@ app.config['SECRET_KEY'] = 'secret_key'
 app.config['JSON_AS_ASCII'] = False
 
 
+@app.route('/')
+def main_page():
+    return render_template("main.html")
+
 @app.route('/calls', methods=['POST'])
 def alice_add_call():
     return call_process(request)
