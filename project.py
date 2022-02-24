@@ -250,10 +250,10 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]['askcat'] = True
 
     else:
+        sessionStorage[user_id]["reask_msg"] = True
         if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
-            sessionStorage[user_id]["reask_msg"] = True
             res['response'][
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
             res['response']['end_session'] = True
