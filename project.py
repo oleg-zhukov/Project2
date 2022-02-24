@@ -252,7 +252,6 @@ def ask1(req, res, user_id):
         if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
-            sessionStorage[user_id]['noask'] = True
             sessionStorage[user_id]["reask_msg"] = True
             res['response'][
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
@@ -374,6 +373,7 @@ def dialog(req, res):
             sessionStorage[user_id]['cats'] += 1
             sessionStorage[user_id]['reask'] = True
             sessionStorage[user_id]['reasked'] = True
+            sessionStorage[user_id]["noask"] = True
         else:
             ask1(req, res, user_id)
 
