@@ -226,6 +226,7 @@ def call_process(request):
 
 
 def ask1(req, res, user_id):
+    print("First asks")
     if sessionStorage[user_id]['cats'] == 0:
         sessionStorage[user_id]['themes'] = themes_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['categories'] = cat_model.predict_proba(sessionStorage[user_id]['message'])
@@ -259,6 +260,7 @@ def ask1(req, res, user_id):
 
 
 def reask(req, res, user_id):
+    print('Reasking...')
     sessionStorage[user_id]["reask_msg"] = False
     if sessionStorage[user_id]['cats'] == 0:
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
@@ -299,6 +301,7 @@ def reask(req, res, user_id):
 
 
 def askcat(req, res, user_id):
+    print("Asking cat...")
     if ask(sessionStorage[user_id]['message']) == 1:
         res['response']['text'] = f'Принято\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}'
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
@@ -314,6 +317,7 @@ def askcat(req, res, user_id):
 
 
 def askTheme(req, res, user_id):
+    print("Asking themes...")
     if sessionStorage[user_id]['new']:
         sessionStorage[user_id]["theme_max"] = np.argmax(sessionStorage[user_id]["themes"])
         sessionStorage[user_id]['new'] = False
@@ -366,8 +370,8 @@ def dialog(req, res):
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
 
     if not sessionStorage[user_id]["noask"]:
-        print("First asks")
         if sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
+            print("Reask message")
             sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
             sessionStorage[user_id]['cats'] += 1
@@ -378,24 +382,14 @@ def dialog(req, res):
             ask1(req, res, user_id)
 
     elif sessionStorage[user_id]['reask']:
-        print('Reasking...')
-        if sessionStorage[user_id]["reask_msg"]:
-            themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
-            cat_proba = cat_model.predict_proba(sessionStorage[user_id]['message'])
-            sessionStorage[user_id]['themes'] *= themes_proba
-            sessionStorage[user_id]['categories'] *= cat_proba
-            sessionStorage[user_id]['cats'] = 0
-            sessionStorage[user_id]["reask_msg"] = False
         reask(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['askcat']:
-        print("Asking cat...")
         askcat(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['asktheme']:
-        print("Asking themes...")
         askTheme(req, res, user_id)
         return
 
