@@ -227,14 +227,14 @@ def call_process(request):
 
 def ask1(req, res, user_id):
     print("First asks")
-    if sessionStorage[user_id]['cats'] == 0:
+    sessionStorage[user_id]['cats'] += 1
+    if sessionStorage[user_id]['cats']-1 == 0:
         sessionStorage[user_id]['themes'] = themes_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['categories'] = cat_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
         res['response']['text'] = f'Вы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}?'
-        sessionStorage[user_id]['cats'] += 1
 
-    elif sessionStorage[user_id]['cats'] == 1:
+    elif sessionStorage[user_id]['cats']-1 == 1:
         if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
@@ -246,7 +246,6 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
             res['response'][
                 'text'] = f'Вы подразумевали категорию {translateTheme(sessionStorage[user_id]["theme_max"])}?'
-            sessionStorage[user_id]['cats'] += 1
             sessionStorage[user_id]['askcat'] = True
 
     else:
