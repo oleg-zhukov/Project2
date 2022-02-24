@@ -200,6 +200,7 @@ def to_zeros(arr, cat):
         if themes[i] not in x:
             arr[0][i] = 0
 
+
 cat_model = joblib.load('./clfs/cat_clf')  # load classificator of categories
 themes_model = joblib.load('./clfs/themes_clf')  # load classificator of themes
 
@@ -255,7 +256,7 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]["reask_msg"] = True
             res['response'][
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
-            res['response']['end_session'] = True            
+            res['response']['end_session'] = True
 
 
 def reask(req, res, user_id):
@@ -367,14 +368,14 @@ def dialog(req, res):
 
     if not sessionStorage[user_id]["noask"]:
         print("First asks")
-        ask1(req, res, user_id)
-
-    if sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
-        sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
-        res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
-        sessionStorage[user_id]['cats'] += 1
-        sessionStorage[user_id]['reask'] = True
-        sessionStorage[user_id]['reasked'] = True
+        if sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
+            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
+            res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
+            sessionStorage[user_id]['cats'] += 1
+            sessionStorage[user_id]['reask'] = True
+            sessionStorage[user_id]['reasked'] = True
+        else:
+            ask1(req, res, user_id)
 
     elif sessionStorage[user_id]['reask']:
         print('Reasking...')
