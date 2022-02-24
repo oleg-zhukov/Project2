@@ -368,9 +368,8 @@ def dialog(req, res):
     if not sessionStorage[user_id]["noask"]:
         print("First asks")
         ask1(req, res, user_id)
-        return
 
-    elif sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
+    if sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
         sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
         res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
         sessionStorage[user_id]['cats'] += 1
