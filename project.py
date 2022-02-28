@@ -307,6 +307,7 @@ def reask(req, res, user_id):
 
 def askcat(req, res, user_id):
     print("Asking cat...")
+    print(sessionStorage[user_id]["categories"][0])
     if ask(sessionStorage[user_id]['message']) == 1:
         res['response']['text'] = f'Принято\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}'
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
@@ -323,6 +324,7 @@ def askcat(req, res, user_id):
 
 def askTheme(req, res, user_id):
     print("Asking themes...")
+    print(sessionStorage[user_id]["themes"])
     if sessionStorage[user_id]['new']:
         sessionStorage[user_id]["theme_max"] = np.argmax(sessionStorage[user_id]["themes"])
         sessionStorage[user_id]['new'] = False
