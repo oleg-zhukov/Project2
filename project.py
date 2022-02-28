@@ -245,17 +245,23 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
             res['response'][
-                'text'] = f'Вы подразумевали категорию {translateTheme(sessionStorage[user_id]["theme_max"])}?'
+                'text'] = f'Вы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}?'
             sessionStorage[user_id]['askcat'] = True
 
     else:
-        sessionStorage[user_id]["reask_msg"] = True
+        sessionStorage[user_id]["noask"] = True
         if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
             res['response'][
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
             res['response']['end_session'] = True
+        else:
+            print("Reask message")
+            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
+            res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
+            sessionStorage[user_id]['cats'] += 1
+
 
 
 def reask(req, res, user_id):
@@ -353,8 +359,6 @@ def dialog(req, res):
             'askcat': False,
             'asktheme': False,
             'new': True,
-            'reask_msg': False,
-            'reasked': False
         }
         # Заполняем текст ответа
         print("New user")
@@ -368,16 +372,7 @@ def dialog(req, res):
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
 
     if not sessionStorage[user_id]["noask"]:
-        if sessionStorage[user_id]["reask_msg"] and not sessionStorage[user_id]["reasked"]:
-            print("Reask message")
-            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
-            res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
-            sessionStorage[user_id]['cats'] += 1
-            sessionStorage[user_id]['reask'] = True
-            sessionStorage[user_id]['reasked'] = True
-            sessionStorage[user_id]["noask"] = True
-        else:
-            ask1(req, res, user_id)
+        ask1(req, res, user_id)
 
     elif sessionStorage[user_id]['reask']:
         reask(req, res, user_id)
