@@ -200,6 +200,7 @@ def to_zeros(arr, cat):
         if themes[i] not in x:
             arr[0][i] = 0
 
+
 cat_model = joblib.load('./clfs/cat_clf')  # load classificator of categories
 themes_model = joblib.load('./clfs/themes_clf')  # load classificator of themes
 
@@ -225,14 +226,15 @@ def call_process(request):
 
 
 def ask1(req, res, user_id):
-    if sessionStorage[user_id]['cats'] == 0:
+    print("First asks")
+    sessionStorage[user_id]['cats'] += 1
+    if sessionStorage[user_id]['cats']-1 == 0:
         sessionStorage[user_id]['themes'] = themes_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['categories'] = cat_model.predict_proba(sessionStorage[user_id]['message'])
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
         res['response']['text'] = f'Вы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}?'
-        sessionStorage[user_id]['cats'] += 1
 
-    elif sessionStorage[user_id]['cats'] == 1:
+    elif sessionStorage[user_id]['cats']-1 == 1:
         if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
@@ -243,26 +245,27 @@ def ask1(req, res, user_id):
             sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
             res['response'][
-                'text'] = f'Вы подразумевали категорию {translateTheme(sessionStorage[user_id]["theme_max"])}?'
-            sessionStorage[user_id]['cats'] += 1
+                'text'] = f'Вы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}?'
             sessionStorage[user_id]['askcat'] = True
 
     else:
-        if ask(sessionStorage[user_id]['message']) == -1:
-            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
-            res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
-            sessionStorage[user_id]['cats'] += 1
-            sessionStorage[user_id]['reask'] = True
-            sessionStorage[user_id]["noask"] = True
-            sessionStorage[user_id]['reask_msg'] = True
-        elif ask(sessionStorage[user_id]['message']) == 1:
+        sessionStorage[user_id]["noask"] = True
+        if ask(sessionStorage[user_id]['message']) == 1:
             sessionStorage[user_id]['theme'] = sessionStorage[user_id]['theme_max']
             sessionStorage[user_id]['categorie'] = getCatOfTheme(sessionStorage[user_id]['theme'])
             res['response'][
                 'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
-            res['response']['end_session'] = True            
+            res['response']['end_session'] = True
+        else:
+            print("Reask message")
+            sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
+            res['response']['text'] = f'Пожалуйста, повторите сообщение, указав больше важной информации'
+            sessionStorage[user_id]['cats'] += 1
+
+
 
 def reask(req, res, user_id):
+    print('Reasking...')
     sessionStorage[user_id]["reask_msg"] = False
     if sessionStorage[user_id]['cats'] == 0:
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
@@ -303,6 +306,8 @@ def reask(req, res, user_id):
 
 
 def askcat(req, res, user_id):
+    print("Asking cat...")
+    print(sessionStorage[user_id]["categories"][0])
     if ask(sessionStorage[user_id]['message']) == 1:
         res['response']['text'] = f'Принято\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}'
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
@@ -318,6 +323,8 @@ def askcat(req, res, user_id):
 
 
 def askTheme(req, res, user_id):
+    print("Asking themes...")
+    print(sessionStorage[user_id]["themes"])
     if sessionStorage[user_id]['new']:
         sessionStorage[user_id]["theme_max"] = np.argmax(sessionStorage[user_id]["themes"])
         sessionStorage[user_id]['new'] = False
@@ -354,13 +361,11 @@ def dialog(req, res):
             'askcat': False,
             'asktheme': False,
             'new': True,
-            'reask_msg': True
         }
         # Заполняем текст ответа
         print("New user")
         res['response']['text'] = 'Здравствуйте! Пожалуйста, расскажите, что произошло'
         return
-    print(sessionStorage[user_id])
     # Сюда дойдем, если пользователь не новый,
     # и разговор с Алисой уже был начат
     # Обрабатываем ответ пользователя.
@@ -368,32 +373,21 @@ def dialog(req, res):
     # Если сообщение меньше 8 токенов переспрашиваем
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
 
-    if not sessionStorage[user_id]['theme'] and not sessionStorage[user_id]['categorie'] and not sessionStorage[user_id]["noask"] and not sessionStorage[user_id]['askcat'] and not sessionStorage[user_id]['reask']:
-        print("First asks")
+    if not sessionStorage[user_id]["noask"]:
         ask1(req, res, user_id)
-        return
-
 
     elif sessionStorage[user_id]['reask']:
-        print('Reasking...')
-        if sessionStorage[user_id]["reask_msg"]:
-            themes_proba = themes_model.predict_proba(sessionStorage[user_id]['message'])
-            cat_proba = cat_model.predict_proba(sessionStorage[user_id]['message'])
-            sessionStorage[user_id]['themes'] *= themes_proba
-            sessionStorage[user_id]['categories'] *= cat_proba
-            sessionStorage[user_id]['cats'] = 0
         reask(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['askcat']:
-        print("Asking cat...")
         askcat(req, res, user_id)
         return
 
     elif sessionStorage[user_id]['asktheme']:
-        print("Asking themes...")
         askTheme(req, res, user_id)
         return
+
 
     '''else:
         f_name = '/content/drive/MyDrive/Data/dataset.csv'
