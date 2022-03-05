@@ -318,6 +318,7 @@ def askcat(req, res, user_id):
     else:
         sessionStorage[user_id]['categories'][0][sessionStorage[user_id]['cat_max']] = 0
         sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
+        print(sessionStorage[user_id])
         res['response'][
             'text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
 
@@ -366,11 +367,7 @@ def dialog(req, res):
         print("New user")
         res['response']['text'] = 'Здравствуйте! Пожалуйста, расскажите, что произошло'
         return
-    # Сюда дойдем, если пользователь не новый,
-    # и разговор с Алисой уже был начат
-    # Обрабатываем ответ пользователя.
-    # Это может быть сообщение - тогда нужно его запомнить и спросить адрес
-    # Если сообщение меньше 8 токенов переспрашиваем
+
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
 
     if not sessionStorage[user_id]["noask"]:
