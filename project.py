@@ -316,6 +316,10 @@ def askcat(req, res, user_id):
         to_zeros(sessionStorage[user_id]["themes"], sessionStorage[user_id]["categorie"])
         print(sessionStorage[user_id]["themes"])
     else:
+        if not sessionStorage[user_id]['categories'].any():
+            res['response']['text'] = 'К сожалению не удалось распознать категорию сообщения'
+            res['response']['end_session'] = True
+            return
         sessionStorage[user_id]['categories'][0][sessionStorage[user_id]['cat_max']] = 0
         sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
         print(sessionStorage[user_id])
@@ -336,6 +340,10 @@ def askTheme(req, res, user_id):
             'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
         res['response']['end_session'] = True
     else:
+        if not sessionStorage[user_id]['themes'].any():
+            res['response']['text'] = 'К сожалению не удалось распознать ntve сообщения'
+            res['response']['end_session'] = True
+            return
         sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
         res['response'][
