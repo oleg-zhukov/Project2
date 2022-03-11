@@ -299,7 +299,7 @@ def reask(req, res, user_id):
             sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
             sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
             res['response'][
-                'text'] = f'Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
+                'text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
             sessionStorage[user_id]['cats'] += 1000
             sessionStorage[user_id]['askcat'] = True
             sessionStorage[user_id]['reask'] = False
@@ -309,7 +309,6 @@ def askcat(req, res, user_id):
     print("Asking cat...")
     print(sessionStorage[user_id]["categories"][0])
     if ask(sessionStorage[user_id]['message']) == 1:
-        sessionStorage[user_id]["theme_max"] = np.argmax(sessionStorage[user_id]["themes"], axis=1)[0]
         res['response']['text'] = f'Принято\nВы подразумевали {translateTheme(sessionStorage[user_id]["theme_max"])}'
         sessionStorage[user_id]["categorie"] = sessionStorage[user_id]["cat_max"]
         sessionStorage[user_id]['askcat'] = False
@@ -317,9 +316,15 @@ def askcat(req, res, user_id):
         to_zeros(sessionStorage[user_id]["themes"], sessionStorage[user_id]["categorie"])
         print(sessionStorage[user_id]["themes"])
     else:
+        if not sessionStorage[user_id]['categories'].any():
+            res['response']['text'] = 'К сожалению не удалось распознать категорию сообщения'
+            res['response']['end_session'] = True
+            return
         sessionStorage[user_id]['categories'][0][sessionStorage[user_id]['cat_max']] = 0
         sessionStorage[user_id]['cat_max'] = np.argmax(sessionStorage[user_id]['categories'], axis=1)[0]
-        res['response']['text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
+        print(sessionStorage[user_id])
+        res['response'][
+            'text'] = f'В таком случае, Вы подразумевали категорию {translateCategorie(sessionStorage[user_id]["cat_max"])}?'
 
 
 def askTheme(req, res, user_id):
@@ -335,6 +340,10 @@ def askTheme(req, res, user_id):
             'text'] = f'Принято:\nТема: {translateTheme(sessionStorage[user_id]["theme"])}\n Категория: {translateC[sessionStorage[user_id]["categorie"]]}'
         res['response']['end_session'] = True
     else:
+        if not sessionStorage[user_id]['themes'].any():
+            res['response']['text'] = 'К сожалению не удалось распознать ntve сообщения'
+            res['response']['end_session'] = True
+            return
         sessionStorage[user_id]['themes'][0][sessionStorage[user_id]['theme_max']] = 0
         sessionStorage[user_id]['theme_max'] = np.argmax(sessionStorage[user_id]['themes'], axis=1)[0]
         res['response'][
@@ -366,11 +375,7 @@ def dialog(req, res):
         print("New user")
         res['response']['text'] = 'Здравствуйте! Пожалуйста, расскажите, что произошло'
         return
-    # Сюда дойдем, если пользователь не новый,
-    # и разговор с Алисой уже был начат
-    # Обрабатываем ответ пользователя.
-    # Это может быть сообщение - тогда нужно его запомнить и спросить адрес
-    # Если сообщение меньше 8 токенов переспрашиваем
+
     sessionStorage[user_id]['message'] = [req['request']['original_utterance']]
 
     if not sessionStorage[user_id]["noask"]:
